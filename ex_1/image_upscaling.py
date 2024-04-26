@@ -50,17 +50,40 @@ class RescaleByZeroPadding:
         fft = np.fft.fft2(image_array)
         fft_shifted = np.fft.fftshift(fft)
         
-        #zero out the center of the fft shifted image
+        #zero out the higher frequency values
         fft_shifted[cY - self.factor:cY + self.factor, cX - self.factor:cX + self.factor] = 0
         
+        #selecting the Fourier transform
         fft_scaled = fft_shifted * self.factor**2
         
+        #selecting the inverse Fourier transform
         ifft = np.fft.ifft2(np.fft.ifftshift(fft_scaled))
         
+        # taking the real part of image and clipping values to [0, 255]
         self.output_image = np.clip(np.abs(ifft), 0, 255).astype(np.uint8)
         
         return self.output_image
         
+
+class RescaleWithInterpolation:
+    
+    def __init__(self, I: Any, factor: int, filter: str) -> None:
+        self.image = I
+        self.factor = factor
+        self.filter = filter
+        self.output_image = None
+    
+    def resize_filter(self):
+        image_array = np.array(self.image)
+        
+        if self.filter == 'tent':
+            x = np.linspace(-1, 1, num=self.factor)
+            h_x = np.array([(1 - np.abs(x)) if abs(x) <= 1 else 0 for x in x])
+        
+        elif self.filter == 'bell':
+            x = np.linspace()
+            
+
 
 
 
@@ -79,7 +102,7 @@ if __name__ == '__main__':
     # plt.imshow(I_resize, cmap='gray')
     # plt.show()
     
-    # zero padding with FFT
+    ## zero padding with FFT
     zero_padding = RescaleByZeroPadding(image, 2)
     I_zeropad = zero_padding.zero_padding()
     plt.imshow(I_zeropad, cmap='gray')
