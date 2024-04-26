@@ -17,7 +17,7 @@ class RescaleByDuplication:
         self.factor = factor
         self.output_image = None
     
-    def resize_copy(self):
+    def resize_copy(self) -> np.ndarray:
         image_array = np.array(self.image)
         
         height, width = image_array.shape[:2]
@@ -34,6 +34,36 @@ class RescaleByDuplication:
         return resized_image
 
 
+class RescaleByZeroPadding:
+    
+    def __init__(self, I: Any, factor: int) -> None:
+        self.image = I
+        self.factor = factor
+        self.output_image = None
+    
+    def zero_padding(self):
+        image_array = np.array(self.image)
+        
+        height, width = image_array.shape[:2]
+        (cX, cY) = (int(height / 2.0), int(width / 2.0))
+        
+        fft = np.fft.fft2(image_array)
+        fft_shifted = np.fft.fftshift(fft)
+        
+        #zero out the center of the fft shifted image
+        fft_shifted[cY - self.factor:cY + self.factor, cX - self.factor:cX + self.factor] = 0
+        
+        fft_scaled = fft_shifted * self.factor**2
+        
+        ifft = np.fft.ifft2(np.fft.ifftshift(fft_scaled))
+        
+        self.output_image = np.clip(np.abs(ifft), 0, 255).astype(np.uint8)
+        
+        return self.output_image
+        
+
+
+
 if __name__ == '__main__':
     
     image = Image.open('goldhill.bmp', 'r')
@@ -42,7 +72,15 @@ if __name__ == '__main__':
     # plt.imshow(rescaled_image, cmap='gray')
     # plt.show()
     
-    resize_image = RescaleByDuplication(image, 2)
-    I_resize = resize_image.resize_copy()
-    plt.imshow(I_resize, cmap='gray')
+    # resize_image = RescaleByDuplication(image, 2)
+    # I_resize = resize_image.resize_copy()
+    # print("Size of original image: " + str(image.size))
+    # print("Size of resized image: " + str(I_resize.shape))
+    # plt.imshow(I_resize, cmap='gray')
+    # plt.show()
+    
+    # zero padding with FFT
+    zero_padding = RescaleByZeroPadding(image, 2)
+    I_zeropad = zero_padding.zero_padding()
+    plt.imshow(I_zeropad, cmap='gray')
     plt.show()
