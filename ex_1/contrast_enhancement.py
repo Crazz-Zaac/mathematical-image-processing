@@ -62,6 +62,11 @@ class NonLinearGammaTransform:
 
 
 class HistogramEqualization:
+    """
+    It is used to spread the histogram over the entire 
+    intensity scale.
+    """
+    
     
     def __init__(self, I: Any) -> None:
         self.image = I
@@ -69,21 +74,25 @@ class HistogramEqualization:
         
     def hist_eq(self):
         image_array = np.array(self.image)
-        hist, bins = np.histogram(image_array, bins=256, range=(0, 255), density=True)
+        hist, bins = np.histogram(image_array, bins=1000, range=(0, 255), density=True)
+        
+        #cumulative sum of histogram
         cdf = hist.cumsum()
+        
+        # normalized histogram
         normalized_cdf = 255 * cdf / cdf[-1]
         self.I_equalized = np.interp(image_array.flatten(), bins[:-1], normalized_cdf).reshape(image_array.shape)
         
 
 if __name__ == '__main__':
     image = Image.open('goldhill.bmp', 'r')
-    calc_hist = ComputeHistogram(image, nbins=120)
-    calc_hist.my_hist()
+    # calc_hist = ComputeHistogram(image, nbins=120)
+    # calc_hist.my_hist()
     
-    # hist_eq = HistogramEqualization(image)
-    # hist_eq.hist_eq()
-    # plt.imshow(hist_eq.I_equalized, cmap='gray')
-    # plt.show()
+    hist_eq = HistogramEqualization(image)
+    hist_eq.hist_eq()
+    plt.imshow(hist_eq.I_equalized, cmap='gray')
+    plt.show()
     
     # nlgt = NonLinearGammaTransform(image, 0.2)
     # gamma_transformed = nlgt.hist_gamma()
