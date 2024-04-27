@@ -72,7 +72,7 @@ class RescaleWithInterpolation:
         self.factor = factor
         self.filter = filter
         self.output_image = None
-    
+     
     def resize_filter(self):
         image_array = np.array(self.image)
         
