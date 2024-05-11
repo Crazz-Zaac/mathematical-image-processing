@@ -12,6 +12,7 @@ def read(path: str, cmap: str) -> np.ndarray:
     CMAP: RGB, BGR, GRAY
     """
     image = cv2.imread(path)
+    cmap = cmap.upper()
     if cmap == 'RGB':
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     elif cmap == 'GRAY':
