@@ -6,12 +6,12 @@ import PIL
 import cv2
 
 
-def my_hist(I: np.ndarray, nbins: int) -> Tuple[np.ndarray, np.ndarray]:
+def my_hist(I: np.ndarray, nbins: int) -> np.ndarray:
     """
     Computes histogram of and Image I with number of nbins.
     """
     output_hist, bins = np.histogram(I.flatten(), bins=nbins, range=(0, 255))
-    return output_hist, bins
+    return output_hist
 
 
 def plot_hist(I: np.ndarray, nbins: int) -> None:
