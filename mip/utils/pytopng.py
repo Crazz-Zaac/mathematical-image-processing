@@ -21,4 +21,7 @@ def py_to_png(py_file_path, png_file_path):
     image.save(png_file_path)
 
 # Example usage
-py_to_png('solution.py', 'solution.png')
+# py_to_png('solution.py', 'solution.png')
+if __name__ == '__main__':
+    import sys
+    py_to_png(sys.argv[1], sys.argv[2])
